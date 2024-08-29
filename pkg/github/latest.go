@@ -8,12 +8,6 @@ import (
 	"time"
 )
 
-type Latest struct {
-	ReleaseTag         string
-	ReleaseSHA         string
-	ReleaseDescription string
-}
-
 type latestResponse struct {
 	TagName     string `json:"tag_name"`
 	Description string `json:"body"`
@@ -81,20 +75,16 @@ func getTag(owner, repo, tag string) (*tagResponse, error) {
 	return result, nil
 }
 
-func LatestVersion(owner, repo string) (*Latest, error) {
+func LatestVersion(owner, repo string) (string, string, string, error) {
 	release, err := getLatest(owner, repo)
 	if err != nil {
-		return nil, err
+		return "", "", "", err
 	}
 
-	tag, err := getTag(owner, repo, release.TagName)
+	tagV, err := getTag(owner, repo, release.TagName)
 	if err != nil {
-		return nil, err
+		return "", "", "", err
 	}
 
-	return &Latest{
-		ReleaseTag:         release.TagName,
-		ReleaseSHA:         tag.Object.SHA,
-		ReleaseDescription: release.Description,
-	}, nil
+	return release.TagName, tagV.Object.SHA, release.Description, nil
 }

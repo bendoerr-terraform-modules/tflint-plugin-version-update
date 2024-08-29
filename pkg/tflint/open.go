@@ -1,17 +1,19 @@
 package tflint
 
 import (
+	"context"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/spf13/afero"
+
+	"github.com/bendoerr-terraform-modules/tflint-plugin-version-update/pkg/ui"
 )
 
 // OpenConfig loads a TFLint config file following the logic from tflint except
 // it will not auto load from the home directory, to update that provide the
-// path explictly.
+// path explicitly.
 //
 // tflint's LoadConfig @ tflint/tflint/config.go
 //
@@ -23,13 +25,16 @@ import (
 //
 // For 1 and 2, if the file does not exist, an error will be returned immediately.
 // If 3 fails then an error will be returned.
-func OpenConfig(fs afero.Afero, file string) (afero.File, error) {
+func OpenConfig(ctx context.Context, fs afero.Afero, file string) (afero.File, error) {
+	ui.Update(ctx, "🔧 Finding config")
+
 	// Load the file passed by the --config option
 	if file != "" {
-		log.Printf("[INFO] Load config: %s", file)
-		f, err := fs.Open(file)
+		ui.Info(ctx, "🔧 Using provided config "+file)
+		f, err := fs.OpenFile(file, os.O_RDWR, os.ModePerm)
 		if err != nil {
-			return nil, fmt.Errorf("unable to open file='%s': %w", file, err)
+			ui.Error(ctx, "🚨 Couldn't open provided config file!")
+			return nil, fmt.Errorf("unable to open config='%s': %w", file, err)
 		}
 		return f, nil
 	}
@@ -37,9 +42,10 @@ func OpenConfig(fs afero.Afero, file string) (afero.File, error) {
 	// Load the file set by the environment variable
 	envFile := os.Getenv("TFLINT_CONFIG_FILE")
 	if envFile != "" {
-		log.Printf("[INFO] Load config: %s", envFile)
+		ui.Info(ctx, "🔧 Using env.TFLINT_CONFIG_FILE "+envFile)
 		f, err := fs.Open(envFile)
 		if err != nil {
+			ui.Error(ctx, "🚨 Couldn't open env.TFLINT_CONFIG_FILE")
 			return nil, fmt.Errorf("unable to open TFLINT_CONFIG_FILE='%s': %w", envFile, err)
 		}
 		return f, nil
@@ -47,11 +53,13 @@ func OpenConfig(fs afero.Afero, file string) (afero.File, error) {
 
 	// Load the default config file
 	var defaultConfigFile = ".tflint.hcl"
-	log.Printf("[INFO] Load default config: %s", defaultConfigFile)
-	if f, err := fs.Open(defaultConfigFile); err == nil {
-		return f, nil
+	ui.Info(ctx, "🔧 Using default config "+defaultConfigFile)
+	f, err := fs.Open(defaultConfigFile)
+	if err != nil {
+		ui.Error(ctx, "🚨 Couldn't open default config")
+		return nil, errors.New("no config file found")
 	}
-	log.Printf("[INFO] Default config not found")
 
-	return nil, errors.New("no config file found")
+	ui.Update(ctx, "")
+	return f, nil
 }

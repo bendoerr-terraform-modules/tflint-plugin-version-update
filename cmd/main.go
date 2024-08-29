@@ -1,20 +1,21 @@
 package main
 
 import (
+	"context"
 	"os"
-	"strings"
 
 	"github.com/alecthomas/kong"
-	"github.com/hashicorp/hcl/v2/hclwrite"
 	"github.com/spf13/afero"
 
 	"github.com/bendoerr-terraform-modules/tflint-plugin-version-update/pkg/github"
 	"github.com/bendoerr-terraform-modules/tflint-plugin-version-update/pkg/tflint"
+	"github.com/bendoerr-terraform-modules/tflint-plugin-version-update/pkg/ui"
 )
 
 type Config struct {
-	Freeze bool   `name:"freeze"`
-	Path   string `name:"path" arg:"" type:"path"`
+	Freeze  bool   `name:"freeze"`
+	Verbose bool   `name:"verbose"`
+	Path    string `name:"path" arg:"" type:"path" optional:"true"`
 }
 
 func main() {
@@ -23,66 +24,43 @@ func main() {
 
 	_ = kong.Parse(&cfg)
 
-	tflFile, err := tflint.OpenConfig(afero.Afero{Fs: afero.NewOsFs()}, cfg.Path)
+	ctx := context.Background()
+	ctx = ui.ToContext(ctx, ui.NewUI(os.Stdout, cfg.Verbose))
+
+	tflFile, err := tflint.OpenConfig(ctx, afero.Afero{Fs: afero.NewOsFs()}, cfg.Path)
 	if err != nil {
-		panic(err)
-	}
-
-	tflData, err := tflint.NewData(tflFile)
-	if err != nil {
-		panic(err)
-	}
-
-	tflHcl, err := tflData.ParseForRead()
-	if err != nil {
-		panic(err)
-	}
-
-	tflHclW, err := tflData.ParseForWrite()
-	if err != nil {
-		panic(err)
-	}
-
-	plugins, err := tflint.FindPluginVersions(tflHcl)
-	if err != nil {
-		panic(err)
-	}
-
-	runUpdate(plugins, cfg, tflHclW)
-
-	_, _ = tflHclW.WriteTo(os.Stdout)
-}
-
-func runUpdate(plugins []*tflint.PluginConfig, cfg Config, tflHclW *hclwrite.File) {
-	for _, plugin := range plugins {
-		latestVersion, err := github.LatestVersion(plugin.SourceOwner, plugin.SourceRepo)
-		if err != nil {
+		if cfg.Verbose {
 			panic(err)
 		}
-
-		if cfg.Freeze {
-			if plugin.Version == latestVersion.ReleaseSHA {
-				continue
-			}
-		} else {
-			if plugin.Version == latestVersion.ReleaseTag || "v"+plugin.Version == latestVersion.ReleaseTag {
-				continue
-			}
-		}
-
-		if cfg.Freeze {
-			err = tflint.UpdatePluginVersion(plugin.Name, latestVersion.ReleaseSHA, latestVersion.ReleaseTag, tflHclW)
-			if err != nil {
-				panic(err)
-			}
-		} else {
-			// Stylistically tflint drops the 'v' in their documentation,
-			// so we'll follow that as well.
-			version := strings.TrimPrefix(latestVersion.ReleaseTag, "v")
-			err = tflint.UpdatePluginVersion(plugin.Name, version, "", tflHclW)
-			if err != nil {
-				panic(err)
-			}
-		}
+		os.Exit(1)
 	}
+
+	tfl := tflint.NewTFLint(tflFile)
+
+	err = tfl.ParseHCL(ctx)
+	if err != nil {
+		if cfg.Verbose {
+			panic(err)
+		}
+		os.Exit(1)
+	}
+
+	err = tfl.UpdatePlugins(ctx, cfg.Freeze, github.LatestVersion)
+	if err != nil {
+		if cfg.Verbose {
+			panic(err)
+		}
+		os.Exit(1)
+	}
+
+	err = tfl.Write(ctx)
+	if err != nil {
+		if cfg.Verbose {
+			panic(err)
+		}
+		os.Exit(1)
+	}
+
+	ui.Stop(ctx)
+	ui.Info(ctx, "✨ Done")
 }
