@@ -1,0 +1,44 @@
+name: "Update dependabot unsupported dependencies"
+
+on:
+  schedule:
+    - cron: "5 0 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pre-commit:
+    name: "Pre-commit Dependency Update"
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: "Harden Runner"
+        uses: step-security/harden-runner@5c7944e73c4c2a096b17a9cb74d65b6c2bbafbde # v2.9.1
+        with:
+          egress-policy: audit
+
+      - name: "Checkout Repository"
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+
+      - name: "Setup Python"
+        uses: actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f # v5.1.1
+
+      - name: "Update .pre-commit-config.yml"
+        run: |
+          pip install pre-commit
+          pre-commit autoupdate --freeze
+
+      - name: "Create new pull-request"
+        uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6.1.0
+        if: always()
+        with:
+          branch: update/pre-commit-hooks
+          title: "⬆️ pch: Update pre-commit hook versions"
+          commit-message: "⬆️ pch: Update pre-commit hook versions"
+          labels: "dependencies,pre-commit"
