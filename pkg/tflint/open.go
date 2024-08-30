@@ -43,7 +43,7 @@ func OpenConfig(ctx context.Context, fs afero.Afero, file string) (afero.File, e
 	envFile := os.Getenv("TFLINT_CONFIG_FILE")
 	if envFile != "" {
 		ui.Info(ctx, "🔧 Using env.TFLINT_CONFIG_FILE "+envFile)
-		f, err := fs.Open(envFile)
+		f, err := fs.OpenFile(envFile, os.O_RDWR, os.ModePerm)
 		if err != nil {
 			ui.Error(ctx, "🚨 Couldn't open env.TFLINT_CONFIG_FILE")
 			return nil, fmt.Errorf("unable to open TFLINT_CONFIG_FILE='%s': %w", envFile, err)
@@ -54,7 +54,7 @@ func OpenConfig(ctx context.Context, fs afero.Afero, file string) (afero.File, e
 	// Load the default config file
 	var defaultConfigFile = ".tflint.hcl"
 	ui.Info(ctx, "🔧 Using default config "+defaultConfigFile)
-	f, err := fs.Open(defaultConfigFile)
+	f, err := fs.OpenFile(defaultConfigFile, os.O_RDWR, os.ModePerm)
 	if err != nil {
 		ui.Error(ctx, "🚨 Couldn't open default config")
 		return nil, errors.New("no config file found")
