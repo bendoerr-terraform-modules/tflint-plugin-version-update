@@ -1,6 +1,6 @@
 module github.com/bendoerr-terraform-modules/tflint-plugin-version-update
 
-go 1.23.0
+go 1.25
 
 require (
 	github.com/alecthomas/kong v1.14.0
@@ -8,7 +8,7 @@ require (
 	github.com/fatih/color v1.18.0
 	github.com/hashicorp/hcl/v2 v2.24.0
 	github.com/spf13/afero v1.15.0
-	github.com/zclconf/go-cty v1.17.0
+	github.com/zclconf/go-cty v1.18.0
 )
 
 require (
