@@ -27,7 +27,7 @@ jobs:
         with:
           github_token: ${{ github.token }}
           reporter: github-pr-review
-          fail_on_error: "false"
+          fail_level: error
           filter_mode: file
           go_version_file: go.mod
   prettier:
@@ -49,7 +49,7 @@ jobs:
         with:
           github_token: ${{ github.token }}
           reporter: github-pr-review
-          fail_on_error: "false"
+          fail_level: error
           filter_mode: file
   misspell:
     runs-on: ubuntu-latest
@@ -67,7 +67,7 @@ jobs:
         with:
           github_token: ${{ github.token }}
           reporter: github-pr-review
-          fail_on_error: "false"
+          fail_level: none
           filter_mode: file
           exclude: |
             ./.git/*
@@ -88,7 +88,7 @@ jobs:
         with:
           github_token: ${{ github.token }}
           reporter: github-pr-review
-          fail_on_error: "false"
+          fail_level: none
           filter_mode: file
   markdownlint:
     runs-on: ubuntu-latest
@@ -106,7 +106,7 @@ jobs:
         with:
           github_token: ${{ github.token }}
           reporter: github-pr-review
-          fail_on_error: "false"
+          fail_level: none
           filter_mode: file
           markdownlint_flags: |
             --disable MD033 MD013 -- .
@@ -126,5 +126,5 @@ jobs:
         with:
           github_token: ${{ github.token }}
           reporter: github-pr-review
-          fail_on_error: "false"
+          fail_level: error
           filter_mode: file
