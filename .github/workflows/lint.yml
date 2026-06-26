@@ -142,12 +142,15 @@ jobs:
           egress-policy: audit
 
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          # No git ops after checkout — don't keep the repo token in .git/config
+          # while we pip-install and run mdformat.
+          persist-credentials: false
 
       # mdformat (frozen 0.7.17, same version as the pre-commit hook) is the
       # org's authoritative markdown formatter — prettier is excluded from
       # markdown via .prettierignore. Hard-check that EVERY committed markdown
-      # file is mdformat-clean, not just the terraform-docs README block, so a
-      # green CI means "all markdown is mdformat-canonical".
+      # file is mdformat-clean, so a green CI means "all markdown is mdformat-canonical".
       - name: mdformat --check
         run: |
           python3 -m pip install --quiet 'mdformat==0.7.17'
