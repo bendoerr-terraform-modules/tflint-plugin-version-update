@@ -41,6 +41,7 @@ jobs:
             ecs.us-west-2.amazonaws.com:443
             elasticfilesystem.us-east-1.amazonaws.com:443
             gateway.discord.gg:443
+            dl.google.com:443
             github.com:22
             github.com:443
             go.dev:443
