@@ -54,6 +54,7 @@ jobs:
             lambda.us-east-1.amazonaws.com:443
             logs.us-east-1.amazonaws.com:443
             objects.githubusercontent.com:443
+            release-assets.githubusercontent.com:443
             proxy.golang.org:443
             registry.npmjs.org:443
             registry.terraform.io:443
