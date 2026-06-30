@@ -1,7 +1,7 @@
 # Thin caller -> reusable lint in bendoerr-terraform-modules/workflows (SHA-pinned, big-blast).
-# Go tool (not a TF module): tflint/trivy/terraform_docs gated OFF; golangci + common on. markdownlint_flags baseline == reusable default.
-# egress uses reusable default (superset of this repo's set -> behavior-preserving). Lint isn't a
-# required check -> rename cosmetic; proof is the fidelity-diff vs this repo's last per-repo run.
+# Go TOOL repo (not a TF module): tflint/trivy/terraform_docs gated OFF; golangci + common on.
+# Its Go module is at the repo ROOT (go.mod), not test/ -> golangci_workdir empty (= action default root)
+# + golangci_go_version_file go.mod, matching this repo's per-repo baseline. egress = reusable default.
 name: Lint
 
 on:
@@ -19,8 +19,10 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-    uses: bendoerr-terraform-modules/workflows/.github/workflows/lint.yml@1c9572cfd56a2aa0b7bd89afe37545ea4c310e40
+    uses: bendoerr-terraform-modules/workflows/.github/workflows/lint.yml@643fb6030f7d4300c4c43416ffef884aa6a3a426
     with:
       tflint: false
       trivy: false
       terraform_docs: false
+      golangci_workdir: ""
+      golangci_go_version_file: "go.mod"
