@@ -21,4 +21,4 @@ jobs:
       contents: read
       security-events: write
       id-token: write
-    uses: bendoerr-terraform-modules/workflows/.github/workflows/scorecard.yml@v1
+    uses: bendoerr-terraform-modules/workflows/.github/workflows/scorecard.yml@v1.2.5
