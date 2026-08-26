@@ -3,7 +3,7 @@ module github.com/bendoerr-terraform-modules/tflint-plugin-version-update
 go 1.25.0
 
 require (
-	github.com/alecthomas/kong v1.16.0
+	github.com/alecthomas/kong v1.16.1
 	github.com/briandowns/spinner v1.23.2
 	github.com/fatih/color v1.19.0
 	github.com/hashicorp/hcl/v2 v2.24.0
