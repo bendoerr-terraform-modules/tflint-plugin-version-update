@@ -14,7 +14,17 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: read
+      # contents: WRITE, not read. `create-pull-request` PUSHES a branch before it opens the PR,
+      # and a push with a read-scoped GITHUB_TOKEN is a 403 -- the token's scope, not a repo or
+      # org setting (both are `read` by default, which is correct hardening; the job block is
+      # what grants what the job needs). This job granted `pull-requests: write` but left
+      # `contents: read`, so it failed at the "Create new pull-request" step on EVERY weekly run
+      # from at least 2026-02-23 through 2026-08-31 -- 28 consecutive failures, ~6 months, never
+      # once green. Nothing surfaced it because dependabot sweeps look at PRs, and this job's
+      # whole failure mode is that it never manages to open one.
+      # The action's own README states the requirement verbatim:
+      #     permissions: {contents: write, pull-requests: write}
+      contents: write
       pull-requests: write
 
     steps:
