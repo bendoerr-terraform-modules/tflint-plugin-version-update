@@ -15,6 +15,8 @@ jobs:
 
     permissions:
       # contents: WRITE, not read. `create-pull-request` PUSHES a branch before it opens the PR,
+      # (FIXED 2026-09-01 by #72 and still correct. It was NOT the whole cause: the job kept
+      #  failing at the same step for a SECOND reason — see the token: comment below.)
       # and a push with a read-scoped GITHUB_TOKEN is a 403 -- the token's scope, not a repo or
       # org setting (both are `read` by default, which is correct hardening; the job block is
       # what grants what the job needs). This job granted `pull-requests: write` but left
@@ -48,6 +50,13 @@ jobs:
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         if: always()
         with:
+          # NOT the default GITHUB_TOKEN. The org setting "allow GitHub Actions to create and
+          # approve pull requests" is OFF (org AND repo level, deliberately — that one toggle
+          # also grants self-approval across every repo). With GITHUB_TOKEN this step fails
+          # "GitHub Actions is not permitted to create or approve pull requests" on EVERY run.
+          # A scoped PAT fixes just this job and leaves the org posture alone (Ben's call,
+          # 2026-09-14). Needs: Contents read/write + Pull requests read/write, this repo only.
+          token: ${{ secrets.DEPENDENCY_UPDATE_TOKEN }}
           branch: update/pre-commit-hooks
           title: "⬆️ pch: Update pre-commit hook versions"
           commit-message: "⬆️ pch: Update pre-commit hook versions"
