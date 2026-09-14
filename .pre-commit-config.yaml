@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: 2c9f875913ee60ca25ce70243dc24d5b6415598c # frozen: v4.6.0
+    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c  # frozen: v6.0.0
     hooks:
       - id: check-added-large-files
       - id: check-case-conflict
@@ -14,21 +14,21 @@ repos:
       - id: trailing-whitespace
 
   - repo: https://github.com/gitleaks/gitleaks
-    rev: 77c3c6a34b2577d71083442326c60b8fd58926ec # frozen: v8.18.4
+    rev: 2ca41cc1372d1e939a6a879f18cdc19fc1cac1ce  # frozen: v8.30.0
     hooks:
       - id: gitleaks
 
   - repo: https://github.com/executablebooks/mdformat
-    rev: 08fba30538869a440b5059de90af03e3502e35fb # frozen: 0.7.17
+    rev: 2d496dbc18e31b83a1596685347ffe0b6041daf0  # frozen: 1.0.0
     hooks:
       - id: mdformat
 
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: f295829140d25717bc79368d3f966fc1f67a824f # frozen: v0.41.0
+    rev: 5b5dddc4fb0f83c3ea1fc5616fa63e115dce83e0  # frozen: v0.49.1
     hooks:
       - id: markdownlint-fix-docker
 
   - repo: https://github.com/golangci/golangci-lint
-    rev: c2e095c022a97360f7fff5d49fbc11f273be929a # frozen: v1.60.3
+    rev: c4e8435b673b0c51918007429309bf9d3cbca904  # frozen: v2.13.2
     hooks:
       - id: golangci-lint
