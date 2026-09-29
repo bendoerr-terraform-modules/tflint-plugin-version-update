@@ -29,6 +29,6 @@ repos:
       - id: markdownlint-fix-docker
 
   - repo: https://github.com/golangci/golangci-lint
-    rev: c4e8435b673b0c51918007429309bf9d3cbca904 # frozen: v2.13.2
+    rev: 793d05316077345337ae9a11ae05ec8f23edfe1b # frozen: v2.14.0
     hooks:
       - id: golangci-lint
