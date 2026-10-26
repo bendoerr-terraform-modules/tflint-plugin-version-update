@@ -24,11 +24,11 @@ repos:
       - id: mdformat
 
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: 5b5dddc4fb0f83c3ea1fc5616fa63e115dce83e0 # frozen: v0.49.1
+    rev: cbcdc463be5464e25e3e955a511599a67b9b987f  # frozen: v0.50.0
     hooks:
       - id: markdownlint-fix-docker
 
   - repo: https://github.com/golangci/golangci-lint
-    rev: 793d05316077345337ae9a11ae05ec8f23edfe1b # frozen: v2.14.0
+    rev: 49ff9b7f5e2eca29d113af14fbf722b87b22b50a  # frozen: v2.15.0
     hooks:
       - id: golangci-lint
